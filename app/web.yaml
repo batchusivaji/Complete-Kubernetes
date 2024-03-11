@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: webapp
-          image: batchusivaji/nodejs:v1.0
+          image: nanajanashia/k8s-demo-app:v1.0
           ports:
           - containerPort: 3000
           env:
@@ -42,7 +42,7 @@ kind: Service
 metadata:
   name: webapp-service
 spec:
-  type: NodePort
+  type: LoadBalancer
   selector:
     app: webapp
   ports:

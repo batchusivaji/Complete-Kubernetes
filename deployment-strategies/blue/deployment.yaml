@@ -1,0 +1,17 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blue-deploy
+spec:
+  minReadySeconds: 2
+  selector:
+    matchLabels:
+      app: blue
+  template:
+    metadata:
+      labels: 
+        app: blue
+    spec:
+      containers:
+        - name: blue-deploy
