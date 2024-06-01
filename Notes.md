@@ -46,7 +46,7 @@ Kubernetes can be ran anywhere (except more integrations exists for AWS/GCE/Azur
 
 
 
-### MiniKube Installation(1.28)
+### Kubeadm Installation(1.28)
 
 excuting all commands both Nodes
 ```yml
