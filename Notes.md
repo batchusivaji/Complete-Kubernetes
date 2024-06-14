@@ -1314,3 +1314,8 @@ Imagine you have a web app running in a K8s cluster, and you want to make it acc
 
 ![https://blog.prodevopsguy.xyz/top-100-devops-interview-questions-and-answers]
 
+![https://prodevopsguy.site/jenkins-tips-tricks-with-detailed-examples]
+
+![https://blog.prodevopsguy.xyz/100-terraform-basic-to-advanced-interview-questions-answers]
+
+![https://prodevopsguy.site/kubernetes-commands-with-examples]
