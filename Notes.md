@@ -1312,3 +1312,5 @@ Imagine you have a web app running in a K8s cluster, and you want to make it acc
 
  This type of Service is especially useful for development and testing purposes, where you might want to quickly expose an application running in a cluster without setting up more complex networking configurations.
 
+![https://blog.prodevopsguy.xyz/top-100-devops-interview-questions-and-answers]
+
