@@ -124,17 +124,17 @@ The container orchestration platform is a software system or service that `manag
   - `When we Run our Application in Docker Containers and if Containers fails we need to Manually Start the Conatiner(Container Down)`
   - `If the Node i.e The machine Fails all the Container Running on the same machine it Should be Re-Created on Other machine(Node Down)`
   
-#### Auto Scaling
+### Auto Scaling
 
-  - scaling there are two types
+  - `scaling there are two types`
 
 ##### Horizontal Pod autoScaling
 
-- Increasing number of Containers
+- `Increasing number of Containers`
   
 ##### Vertical Pod autoScaling
   
-- Increasing Size of the Conatiner
+- `Increasing Size of the Conatiner`
 
 #### Self-Healing
 
@@ -159,8 +159,11 @@ The container orchestration platform is a software system or service that `manag
   * kubelet
   * container engine
   * kube-proxy
+
 #### ectd 
-* `This is memory of the k8s cluster or k8s uses etc to store all the cluster data`
+* `This is memory of the k8s cluster `
+* `Stores important Cluster data  Securely .Only the API server can directly access etcd,ensuring the data integrity and consistency`
+
 * etcd cluster can scale across multiple nodes unlike traditional databases
 * This is distribute key-value store
   
@@ -174,9 +177,10 @@ The container orchestration platform is a software system or service that `manag
 * The api server is over https and requires authentication
   
 #### kube-scheduler
-* `Scheduler is responsible for creating k8s objects(pods) and scheduling them on right node`
 
-#### kube-controller-manager
+* `Scheduler is responsible for creating k8s objects(pods) and scheduling them on right node based on resource availability and requirements `
+
+### kube-controller-manager
 
 * `This ensures desired state is maintained`
 * This is combination of multiple controller
@@ -200,7 +204,8 @@ status:
     status: "False"
 ```
 
-### Replication Controller: Ensuring a specific number of pod replicas are running or Responsible for maintaining the correct number of pods for every replication controller object in the system.
+#### Replication Controller: Ensuring a specific number of pod replicas are running or Responsible for maintaining the correct number of pods for every replication controller object in the system.
+
 - Example:
 If a deployment specifies that three replicas of a pod should be running, the Replication Controller ensures this is the case. If one pod crashes, it will start a new one to maintain three running replicas
 
@@ -225,6 +230,7 @@ spec:
 ```
 
 #### Namespace Controller: Deleting a namespace
+
 - Example: 
 When a namespace (e.g., test-namespace) is deleted, the Namespace Controller ensures that all resources within that namespace (pods, services, etc.) are also deleted.
 
@@ -235,6 +241,7 @@ metadata:
   name: test-namespace
 ```
 #### Endpoint Controller: Maintaining service endpoints.
+
 - Example:
 If you have a service (e.g., my-service) that selects pods based on certain labels, the Endpoint Controller updates the Endpoints object whenever pods are added or removed. 
 
@@ -265,7 +272,7 @@ subsets:
     ports:
       - port: 9376
 ```
-### ServiceAccount Controller:  Managing service accounts.
+#### ServiceAccount Controller:  Managing service accounts.
 
 Example:
 When a namespace is created, the ServiceAccount Controller automatically creates a default service account for that namespace.
@@ -277,12 +284,18 @@ metadata:
   name: default
   namespace: test-namespace
 ```
+### Cloud Controller manager
+
+* Connects your cluster to cloud provider's features .it handle nodes, routes and sevices letting cloud features integrate with smoothly with k8s
 
 #### kubelet
 
 - `This is the agent of the Worker Node`. It makes sure that containers are running in a pod.
+
 - This reacts to requests/orders from control plane components and speaks with container runtime and gets the work done
+
 - If it fails responds back to control plane with status
+
 * The kubelet takes a set of PodSpecs that are provided through various mechanisms and ensures that the containers described in those PodSpecs are running and healthy. The kubelet doesn’t manage containers which were not created by Kubernetes.
 
 * Kubelet is the primary node agent. It watches for pods that have been assigned to its node (either by apiserver or via local configuration file) 
@@ -306,7 +319,7 @@ metadata:
 
 * kube-proxy is a component of Kubernetes that maintains network rules on nodes. It can use the operating system's packet filtering layer, such as iptables on Linux, to direct traffic or it can handle traffic forwarding itself when such features are unavailable. Here are examples of both scenarios
 
-* example-1:  `Using Operating System Packet Filtering (e.g. iptables)`
+* `example-1`:  `Using Operating System Packet Filtering (e.g. iptables)`
 - `Scenario`: Using iptables to route traffic to service endpoints.
 
 - Example: Suppose you have a service my-service which exposes port 80 and routes traffic to pods with the label app: my-app. When using iptables, kube-proxy will set up the necessary rules to direct incoming traffic on port 80 to the appropriate pods.
@@ -335,7 +348,7 @@ iptables -t nat -A KUBE-SVC-XYZ123 -m statistic --mode random --probability 0.33
 iptables -t nat -A KUBE-SEP-ABCDE1 -s 192.168.1.2/32 -p tcp -m tcp --dport 9376 -j DNAT --to-destination 192.168.1.2:9376
 ```
 
- - Example-2: `Forwarding Traffic Directly (Userspace Mode)`
+ - `Example-2`: `Forwarding Traffic Directly (Userspace Mode)`
 
  `Scenario`: When the operating system does not support iptables or other packet filtering tools, kube-proxy can run in userspace mode to handle traffic forwarding itself.
 
@@ -363,6 +376,8 @@ In this mode, kube-proxy itself will bind to port 80. When traffic comes in, kub
 
 #### Container Runtime
 
+- The container runtime is the software that is responsible for running containers 
+- Manages containers and images, enabling them to work seamlessly on Kubernetes. It's the bridge between Kubernetes and container runtimes like Docker.
 - this is container engine
 - this could be docker or any other CRI compatible runtime
 
