@@ -1,51 +1,6 @@
 
 # Kubernetes
 
-Is an open-source orchestration system for Docker containers.
-
-- Lets you schedule containers on a cluster of machines
-- You can run multiple containers on one machine
-- You can run long running services (like web applications)
-- Managed the state of these containers
-  - Can start container on specific nodes
-  - Will restart a container when it gets killed
-  - Can move containers from one node to another node
-
-- Instead of running a few docker containers manually. Kubernetes manages it for you.
-- Clusters can start with one node until thousands of nodes
-- Some other popular container orchestrations are
-  - Kubernetes
-  - Apache Mesos
-  - Hashicorp Nomad
-  - Docker Swarm
-  - Amazon ECS
-
-Kubernetes:
-  - On-premise
-  - Public (AWS)
-  - Hybrid: public & private
-
-- Highly modular
-- Open source
-- Backed by Google
-
-### Docker Engine
-
-- Docker runtime
-- Software to run docker images
-
-Docker Hub
-
-- Online service to store and fetch docker images
-- Also allows you to build docker images online
-
-Kubernetes can be ran anywhere (except more integrations exists for AWS/GCE/Azure)
-
-- Things like Volumes and External Load Balancers work only with supported Cloud Providers
-- Minikube - run Kubernetes locally
-
-
-
 ### Kubeadm Installation(1.28)
 
 excuting all commands both Nodes
@@ -150,12 +105,12 @@ The container orchestration platform is a software system or service that `manag
 
 
 ### k8s components
-- Control Plane or Master Node
+#### Control Plane or Master Node
   * kube-api Server
   * kube-scheduler
   * kube-controller-manager
   * etcd
-* Worker Node or Slave
+#### Worker Node or Slave
   * kubelet
   * container engine
   * kube-proxy
@@ -190,7 +145,7 @@ The container orchestration platform is a software system or service that `manag
   - EndpointController
   - ServiceAccountController
 #### NodeController:  Responsible for noticing and responding when nodes go down.
-- example:
+- `example`:
 If a node (eg: node-1) in the cluster stops responding, the Node Controller detects this issue and marks node-1 as "NotReady". If the node remains unresponsive for a specified period, `the Node Controller may also decide to evict pods from this node and schedule them on other healthy nodes to ensure application availability`.
 
 ```yaml
@@ -296,7 +251,7 @@ metadata:
 
 - If it fails responds back to control plane with status
 
-* The kubelet takes a set of PodSpecs that are provided through various mechanisms and ensures that the containers described in those PodSpecs are running and healthy. The kubelet doesn’t manage containers which were not created by Kubernetes.
+*  `Ensures containers are healthy and manages node resources. It's like a caretaker, making sure containers are running well on their assigned nodes.`
 
 * Kubelet is the primary node agent. It watches for pods that have been assigned to its node (either by apiserver or via local configuration file) 
 
@@ -309,13 +264,13 @@ metadata:
    
 #### kube-proxy
 
-- This is responsible for networking Communication
+- `This is responsible for networking Communication`
 
 *  This implementations will be based on CNI
 
-- kube-proxy is a network proxy that runs on each node in your cluster, implementing part of the Kubernetes Service concept.
+- `kube-proxy is a network proxy that runs on each node in your cluster, implementing part of the Kubernetes Service concept`.
 
-* kube-proxy maintains network rules on nodes. These network rules allow network communication to your Pods from network sessions inside or outside of your cluster(like communication between Service and Pods )
+*` kube-proxy maintains network rules on nodes. These network rules allow network communication to your Pods from network sessions inside or outside of your cluster(like communication between Service and Pods )`
 
 * kube-proxy is a component of Kubernetes that maintains network rules on nodes. It can use the operating system's packet filtering layer, such as iptables on Linux, to direct traffic or it can handle traffic forwarding itself when such features are unavailable. Here are examples of both scenarios
 
@@ -372,12 +327,12 @@ spec:
 
 In this mode, kube-proxy itself will bind to port 80. When traffic comes in, kube-proxy selects a backend pod (based on the service's selector and load balancing policy) and forwards the traffic to the pod.
 
-* ex: Client ---> kube-proxy (port 80) ---> Pod (192.168.1.2:9376)
+* `ex: Client ---> kube-proxy (port 80) ---> Pod (192.168.1.2:9376)`
 
 #### Container Runtime
 
 - The container runtime is the software that is responsible for running containers 
-- Manages containers and images, enabling them to work seamlessly on Kubernetes. It's the bridge between Kubernetes and container runtimes like Docker.
+- `Manages containers and images, enabling them to work seamlessly on Kubernetes. It's the bridge between Kubernetes and container runtimes like Docker.`
 - this is container engine
 - this could be docker or any other CRI compatible runtime
 
