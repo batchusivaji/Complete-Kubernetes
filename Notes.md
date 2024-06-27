@@ -131,7 +131,7 @@ The container orchestration platform is a software system or service that `manag
   
 #### kube-apiserver
 
-![preview](images\architecture-kuber.png)
+![preview](images/architecture-kuber.png)
 
 * `it will handels all communication of k8s cluster.let it be internal or external`
 * This is most important component of the k8s control plane
