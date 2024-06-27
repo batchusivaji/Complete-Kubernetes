@@ -1,0 +1,46 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: liveness
+spec:
+  minReadySeconds: 2
+  replicas: 1
+  selector:
+    matchExpressions:
+      - key: environment
+        operator: NotIn
+        values: 
+          - qa
+      - key: env
+        operator: In
+        values: 
+          - dev
+          - production
+  template:
+    metadata:
+      labels:
+        env: dev
+        environment: uat
+    spec:
+      containers:
+        - name: caddy
+          image: caddy
+          args:
+            - /bin/sh
+            - -c
+            - touch /tmp/dev; sleep 30 x  
+          ports:
+            - containerPort: 80
+          livenessProbe:
+            exec:
+              command:
+                - cat 
+                - /tmp/dev
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+            timeoutSeconds: 5
+            terminationGracePeriodSeconds: 10
+

@@ -127,7 +127,7 @@ The container orchestration platform is a software system or service that `manag
 #### Auto Scaling
 
   - scaling there are two types
-  - 
+
 ##### Horizontal Pod autoScaling
 
 - Increasing number of Containers
@@ -177,6 +177,7 @@ The container orchestration platform is a software system or service that `manag
 * `Scheduler is responsible for creating k8s objects(pods) and scheduling them on right node`
 
 #### kube-controller-manager
+
 * `This ensures desired state is maintained`
 * This is combination of multiple controller
   - NodeController
@@ -184,15 +185,181 @@ The container orchestration platform is a software system or service that `manag
   - Namespace Controller
   - EndpointController
   - ServiceAccountController
+#### NodeController:  Responsible for noticing and responding when nodes go down.
+- example:
+If a node (eg: node-1) in the cluster stops responding, the Node Controller detects this issue and marks node-1 as "NotReady". If the node remains unresponsive for a specified period, `the Node Controller may also decide to evict pods from this node and schedule them on other healthy nodes to ensure application availability`.
+
+```yaml
+apiVersion: v1
+kind: Node
+metadata:
+  name: node-1
+status:
+  conditions:
+  - type: Ready
+    status: "False"
+```
+
+### Replication Controller: Ensuring a specific number of pod replicas are running or Responsible for maintaining the correct number of pods for every replication controller object in the system.
+- Example:
+If a deployment specifies that three replicas of a pod should be running, the Replication Controller ensures this is the case. If one pod crashes, it will start a new one to maintain three running replicas
+
+```yaml
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: my-app
+spec:
+  replicas: 3
+  selector:
+    app: my-app
+  template:
+    metadata:
+      labels:
+        app: my-app
+    spec:
+      containers:
+      - name: caddy
+        image: caddy
+
+```
+
+#### Namespace Controller: Deleting a namespace
+- Example: 
+When a namespace (e.g., test-namespace) is deleted, the Namespace Controller ensures that all resources within that namespace (pods, services, etc.) are also deleted.
+
+```yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: test-namespace
+```
+#### Endpoint Controller: Maintaining service endpoints.
+- Example:
+If you have a service (e.g., my-service) that selects pods based on certain labels, the Endpoint Controller updates the Endpoints object whenever pods are added or removed. 
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-service
+spec:
+  selector:
+    app: my-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 9376
+
+```
+* The Endpoints object for this service might look like:
+
+```yaml
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: my-service
+subsets:
+  - addresses:
+      - ip: 192.0.2.1
+    ports:
+      - port: 9376
+```
+### ServiceAccount Controller:  Managing service accounts.
+
+Example:
+When a namespace is created, the ServiceAccount Controller automatically creates a default service account for that namespace.
+
+```yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: default
+  namespace: test-namespace
+```
+
 #### kubelet
-- `This is the agent of the control plane` 
+
+- `This is the agent of the Worker Node`. It makes sure that containers are running in a pod.
 - This reacts to requests/orders from control plane components and speaks with container runtime and gets the work done
 - If it fails responds back to control plane with status
+* The kubelet takes a set of PodSpecs that are provided through various mechanisms and ensures that the containers described in those PodSpecs are running and healthy. The kubelet doesn’t manage containers which were not created by Kubernetes.
 
+* Kubelet is the primary node agent. It watches for pods that have been assigned to its node (either by apiserver or via local configuration file) 
+
+  - Mounts the pod’s required volumes.
+  - Downloads the pod’s secrets.
+  - Runs the pod’s containers via docker (or, experimentally, rkt).
+  - Periodically executes any requested container liveness probes.
+  - Reports the status of the pod back to the rest of the system, by creating a mirror pod if necessary.
+  - Reports the status of the node back to the rest of the system.
+   
 #### kube-proxy
 
-- this is responsible for networking
-- this implementations will be based on CNI
+- This is responsible for networking Communication
+
+*  This implementations will be based on CNI
+
+- kube-proxy is a network proxy that runs on each node in your cluster, implementing part of the Kubernetes Service concept.
+
+* kube-proxy maintains network rules on nodes. These network rules allow network communication to your Pods from network sessions inside or outside of your cluster(like communication between Service and Pods )
+
+* kube-proxy is a component of Kubernetes that maintains network rules on nodes. It can use the operating system's packet filtering layer, such as iptables on Linux, to direct traffic or it can handle traffic forwarding itself when such features are unavailable. Here are examples of both scenarios
+
+* example-1:  `Using Operating System Packet Filtering (e.g. iptables)`
+- `Scenario`: Using iptables to route traffic to service endpoints.
+
+- Example: Suppose you have a service my-service which exposes port 80 and routes traffic to pods with the label app: my-app. When using iptables, kube-proxy will set up the necessary rules to direct incoming traffic on port 80 to the appropriate pods.
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-service
+spec:
+  selector:
+    app: my-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 9376
+
+```
+`iptables Rules`:
+kube-proxy creates rules similar to the following:
+
+```yaml
+# Generated by kube-proxy
+iptables -t nat -A KUBE-SERVICES -d 10.0.0.1/32 -p tcp -m tcp --dport 80 -j KUBE-SVC-XYZ123
+iptables -t nat -A KUBE-SVC-XYZ123 -m statistic --mode random --probability 0.33333333349 -j KUBE-SEP-ABCDE1
+iptables -t nat -A KUBE-SEP-ABCDE1 -s 192.168.1.2/32 -p tcp -m tcp --dport 9376 -j DNAT --to-destination 192.168.1.2:9376
+```
+
+ - Example-2: `Forwarding Traffic Directly (Userspace Mode)`
+
+ `Scenario`: When the operating system does not support iptables or other packet filtering tools, kube-proxy can run in userspace mode to handle traffic forwarding itself.
+
+- Example: In userspace mode, kube-proxy listens on the service port and proxies the traffic to the backend pods.
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-service
+spec:
+  selector:
+    app: my-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 9376
+
+```
+`Userspace Mode Functionality`:
+
+In this mode, kube-proxy itself will bind to port 80. When traffic comes in, kube-proxy selects a backend pod (based on the service's selector and load balancing policy) and forwards the traffic to the pod.
+
+* ex: Client ---> kube-proxy (port 80) ---> Pod (192.168.1.2:9376)
 
 #### Container Runtime
 
@@ -290,7 +457,8 @@ Container orchestration platforms implement security features like role-based ac
 
 ### ReplicaSet
 
-Scaling: Scaling in k8s means increasing number of Pods not containers in Pod. For Scaling pods we would learn Replica set/Replication Controller etcs..
+1. A Replica Set ensures that a specified number of pod replicas are running at any one time or A Replica set help you to define how many pods are available at any time. If you define replica as three, then one pod die, the Replica Set create a pod to make it three
+2. Scaling in k8s means increasing number of Pods not containers in Pod. For Scaling pods we would learn Replica set/Replication Controller etcs..
 
 - kubectl get no
 - kubectl get rs,po
