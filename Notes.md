@@ -93,29 +93,36 @@ The container orchestration platform is a software system or service that `manag
 
 #### Self-Healing
 
- - Kubernetes continuously monitors the health of applications and if Pod fail automatically replaces new Pod
+ - `Kubernetes continuously monitors the health of applications and if Pod fail automatically replaces new Pod`
 
 #### Rolling Updates and Rollbacks
 
-- k8s supports rolling updates it means enabling update your application wwithout Downtime and if any issues after updated your application and roll back to previous version 
+- `k8s supports rolling updates it means enabling update your application wwithout Downtime and if any issues after updated your application and roll back to previous version`
   
 ### k8s architecture
 
 ![preview](images/cluster.png)
 
+![preview](images/etcd-master.png)
+
 
 ### k8s components
+
 #### Control Plane or Master Node
+
   * kube-api Server
   * kube-scheduler
   * kube-controller-manager
   * etcd
+
 #### Worker Node or Slave
+
   * kubelet
   * container engine
   * kube-proxy
 
 #### ectd 
+
 * `This is memory of the k8s cluster `
 * `Stores important Cluster data  Securely .Only the API server can directly access etcd,ensuring the data integrity and consistency`
 
@@ -123,6 +130,9 @@ The container orchestration platform is a software system or service that `manag
 * This is distribute key-value store
   
 #### kube-apiserver
+
+![preview](/images/architecture-kuber.jpeg)
+
 * `it will handels all communication of k8s cluster.let it be internal or external`
 * This is most important component of the k8s control plane
 * kube-api server exposes REST API which enables clients to send HTTP requests to kube-api server
@@ -144,7 +154,9 @@ The container orchestration platform is a software system or service that `manag
   - Namespace Controller
   - EndpointController
   - ServiceAccountController
+
 #### NodeController:  Responsible for noticing and responding when nodes go down.
+
 - `example`:
 If a node (eg: node-1) in the cluster stops responding, the Node Controller detects this issue and marks node-1 as "NotReady". If the node remains unresponsive for a specified period, `the Node Controller may also decide to evict pods from this node and schedule them on other healthy nodes to ensure application availability`.
 
